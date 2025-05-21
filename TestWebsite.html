@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Despicable Me & World Events Timeline</title>
+  <meta name="viewport" content="width=1200">
+  <style>
+    body {
+      margin: 0;
+      background: #FED154;
+      font-family: 'Montserrat', 'Arial', sans-serif;
+      overflow: hidden;
+    }
+    h1 {
+      text-align: center;
+      color: #0357A0;
+      font-size: 2.5em;
+      letter-spacing: 2px;
+      margin: 24px 0 8px 0;
+      font-family: 'Luckiest Guy', cursive, sans-serif;
+      text-shadow: 2px 2px 0 #fff, 4px 4px 0 #0357A0;
+    }
+    .timeline-container {
+      position: absolute;
+      top: 80px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+      background: repeating-linear-gradient(90deg, #F7E37A 0 80px, #FED154 80px 160px);
+    }
+    .timeline {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      height: 10px;
+      background: #0357A0;
+      border-radius: 5px;
+      width: 5000px;
+      transform: translateY(-50%);
+      z-index: 1;
+      transition: transform 0.3s;
+    }
+    .event {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      z-index: 2;
+      text-align: center;
+      width: 120px;
+      margin-left: -60px;
+    }
+    .event .icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 6px auto;
+      border-radius: 50%;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 2px 2px 8px #0002;
+      border: 3px solid #0357A0;
+      font-size: 2em;
+    }
+    .minion { background: #FED154; }
+    .war { background: #DBDBDB; }
+    .social { background: #A8E6CF; }
+    .sports { background: #FFB347; }
+    .event .label {
+      font-size: 1em;
+      font-weight: bold;
+      color: #121413;
+      background: #fff7;
+      border-radius: 8px;
+      padding: 2px 6px;
+      box-shadow: 1px 1px 4px #0001;
+    }
+    .event .year {
+      font-size: 0.85em;
+      color: #0357A0;
+      display: block;
+      margin-top: 2px;
+    }
+    .popup-bg {
+      display: none;
+      position: fixed;
+      left: 0; top: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .popup-bg.active { display: flex; }
+    .popup {
+      background: #fff;
+      border-radius: 20px;
+      padding: 32px 24px 24px 24px;
+      min-width: 320px;
+      max-width: 400px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      position: relative;
+      animation: popin 0.3s;
+    }
+    @keyframes popin {
+      from { transform: scale(0.7);}
+      to { transform: scale(1);}
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px; right: 18px;
+      font-size: 1.8em;
+      color: #0357A0;
+      cursor: pointer;
+      font-weight: bold;
+      border: none;
+      background: none;
+    }
+    .zoom-controls {
+      position: fixed;
+      top: 18px;
+      right: 32px;
+      z-index: 10;
+    }
+    .zoom-controls button {
+      font-size: 1.5em;
+      margin: 0 4px;
+      background: #0357A0;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      cursor: pointer;
+      box-shadow: 1px 1px 6px #0002;
+      transition: background 0.2s;
+    }
+    .zoom-controls button:hover {
+      background: #FED154;
+      color: #0357A0;
+    }
+    /* Scrollbar hidden for aesthetics */
+    ::-webkit-scrollbar { display: none; }
+  </style>
+  <!-- Fun font for movie feel -->
+  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+</head>
+<body>
+  <h1>Despicable Me & World Events Timeline</h1>
+  <div class="zoom-controls">
+    <button onclick="zoom(-1)">−</button>
+    <button onclick="zoom(1)">+</button>
+  </div>
+  <div class="timeline-container" id="timelineContainer">
+    <div class="timeline" id="timeline"></div>
+    <!-- Timeline Events -->
+    <!-- Prehistoric (Cro Minion) -->
+    <div class="event" style="left: 40px;" data-popup="popup1">
+      <div class="icon minion">🦕</div>
+      <div class="label">Cro Minion<br><span class="year">Prehistoric</span></div>
+    </div>
+    <!-- Ancient Egypt -->
+    <div class="event" style="left: 120px;" data-popup="popup2">
+      <div class="icon minion">👑</div>
+      <div class="label">Minions in Egypt<br><span class="year">c. 2500 BC</span></div>
+    </div>
+    <!-- Thirty Years' War -->
+    <div class="event" style="left: 260px;" data-popup="popup3">
+      <div class="icon war">⚔️</div>
+      <div class="label">Thirty Years' War<br><span class="year">1618–1648</span></div>
+    </div>
+    <!-- Minions & Dracula -->
+    <div class="event" style="left: 340px;" data-popup="popup4">
+      <div class="icon minion">🧛‍♂️</div>
+      <div class="label">Minions & Dracula<br><span class="year">1700s</span></div>
+    </div>
+    <!-- American Revolution -->
+    <div class="event" style="left: 410px;" data-popup="popup5">
+      <div class="icon war">🎆</div>
+      <div class="label">American Revolution<br><span class="year">1775–1783</span></div>
+    </div>
+    <!-- Napoleonic Wars -->
+    <div class="event" style="left: 480px;" data-popup="popup6">
+      <div class="icon war">🎖️</div>
+      <div class="label">Napoleonic Wars<br><span class="year">1803–1815</span></div>
+    </div>
+    <!-- Minions & Napoleon -->
+    <div class="event" style="left: 520px;" data-popup="popup7">
+      <div class="icon minion">🇫🇷</div>
+      <div class="label">Minions & Napoleon<br><span class="year">1800s</span></div>
+    </div>
+    <!-- World War I -->
+    <div class="event" style="left: 600px;" data-popup="popup8">
+      <div class="icon war">🌍</div>
+      <div class="label">World War I<br><span class="year">1914–1918</span></div>
+    </div>
+    <!-- World War II -->
+    <div class="event" style="left: 670px;" data-popup="popup9">
+      <div class="icon war">🌎</div>
+      <div class="label">World War II<br><span class="year">1939–1945</span></div>
+    </div>
+    <!-- NFL Founded -->
+    <div class="event" style="left: 750px;" data-popup="popup10">
+      <div class="icon sports">🏈</div>
+      <div class="label">NFL Founded<br><span class="year">1920</span></div>
+    </div>
+    <!-- Civil Rights Act -->
+    <div class="event" style="left: 830px;" data-popup="popup11">
+      <div class="icon social">⚖️</div>
+      <div class="label">Civil Rights Act<br><span class="year">1964</span></div>
+    </div>
+    <!-- First Super Bowl -->
+    <div class="event" style="left: 880px;" data-popup="popup12">
+      <div class="icon sports">🏆</div>
+      <div class="label">First Super Bowl<br><span class="year">1967</span></div>
+    </div>
+    <!-- Minions meet Scarlet Overkill -->
+    <div class="event" style="left: 900px;" data-popup="popup13">
+      <div class="icon minion">💎</div>
+      <div class="label">Minions & Scarlet<br><span class="year">1968</span></div>
+    </div>
+    <!-- Minions meet Gru -->
+    <div class="event" style="left: 940px;" data-popup="popup14">
+      <div class="icon minion">👦</div>
+      <div class="label">Minions meet Gru<br><span class="year">1968</span></div>
+    </div>
+    <!-- Vietnam War ends -->
+    <div class="event" style="left: 1020px;" data-popup="popup15">
+      <div class="icon war">🪖</div>
+      <div class="label">Vietnam War Ends<br><span class="year">1975</span></div>
+    </div>
+    <!-- Minions: The Rise of Gru -->
+    <div class="event" style="left: 1080px;" data-popup="popup16">
+      <div class="icon minion">🚲</div>
+      <div class="label">Rise of Gru<br><span class="year">1976</span></div>
+    </div>
+    <!-- Berlin Wall falls -->
+    <div class="event" style="left: 1200px;" data-popup="popup17">
+      <div class="icon war">🧱</div>
+      <div class="label">Berlin Wall Falls<br><span class="year">1989</span></div>
+    </div>
+    <!-- Despicable Me -->
+    <div class="event" style="left: 1350px;" data-popup="popup18">
+      <div class="icon minion">😈</div>
+      <div class="label">Despicable Me<br><span class="year">2010</span></div>
+    </div>
+    <!-- Despicable Me Shorts (2010–2015) -->
+    <div class="event" style="left: 1380px;" data-popup="popup19">
+      <div class="icon minion">🎬</div>
+      <div class="label">Short Films<br><span class="year">2010–2015</span></div>
+    </div>
+    <!-- Affordable Care Act -->
+    <div class="event" style="left: 1430px;" data-popup="popup20">
+      <div class="icon social">💊</div>
+      <div class="label">ACA Signed<br><span class="year">2010</span></div>
+    </div>
+    <!-- Despicable Me 2 -->
+    <div class="event" style="left: 1500px;" data-popup="popup21">
+      <div class="icon minion">👰</div>
+      <div class="label">Despicable Me 2<br><span class="year">2013</span></div>
+    </div>
+    <!-- Black Lives Matter -->
+    <div class="event" style="left: 1530px;" data-popup="popup22">
+      <div class="icon social">✊🏾</div>
+      <div class="label">BLM Begins<br><span class="year">2013</span></div>
+    </div>
+    <!-- Odell Beckham Jr. Catch -->
+    <div class="event" style="left: 1550px;" data-popup="popup23">
+      <div class="icon sports">🤯</div>
+      <div class="label">OBJ Catch<br><span class="year">2014</span></div>
+    </div>
+    <!-- Same-sex marriage US -->
+    <div class="event" style="left: 1580px;" data-popup="popup24">
+      <div class="icon social">🌈</div>
+      <div class="label">Marriage Equality<br><span class="year">2015</span></div>
+    </div>
+    <!-- Despicable Me 3 -->
+    <div class="event" style="left: 1620px;" data-popup="popup25">
+      <div class="icon minion">🕺</div>
+      <div class="label">Despicable Me 3<br><span class="year">2017</span></div>
+    </div>
+    <!-- MeToo -->
+    <div class="event" style="left: 1650px;" data-popup="popup26">
+      <div class="icon social">#️⃣</div>
+      <div class="label">#MeToo<br><span class="year">2017</span></div>
+    </div>
+    <!-- COVID-19 -->
+    <div class="event" style="left: 1700px;" data-popup="popup27">
+      <div class="icon war">🦠</div>
+      <div class="label">COVID-19<br><span class="year">2020</span></div>
+    </div>
+    <!-- Minions: The Rise of Gru (aftermath) -->
+    <div class="event" style="left: 1750px;" data-popup="popup28">
+      <div class="icon minion">🔮</div>
+      <div class="label">Rise of Gru (aftermath)<br><span class="year">2022</span></div>
+    </div>
+    <!-- Roe v. Wade overturned -->
+    <div class="event" style="left: 1790px;" data-popup="popup29">
+      <div class="icon social">⚖️</div>
+      <div class="label">Roe v. Wade Overturned<br><span class="year">2022</span></div>
+    </div>
+    <!-- Despicable Me 4 -->
+    <div class="event" style="left: 1850px;" data-popup="popup30">
+      <div class="icon minion">👶</div>
+      <div class="label">Despicable Me 4<br><span class="year">2024</span></div>
+    </div>
+    <!-- Minions 3 -->
+    <div class="event" style="left: 1920px;" data-popup="popup31">
+      <div class="icon minion">🧨</div>
+      <div class="label">Minions 3<br><span class="year">2026</span></div>
+    </div>
+    <!-- Paris Olympics -->
+    <div class="event" style="left: 1950px;" data-popup="popup32">
+      <div class="icon sports">🇫🇷</div>
+      <div class="label">Paris Olympics<br><span class="year">2024</span></div>
+    </div>
+  </div>
+  <!-- Popups -->
+  <div class="popup-bg" id="popup-bg">
+    <div class="popup" id="popup-content">
+      <button class="close-btn" onclick="closePopup()">×</button>
+      <div id="popup-inner"></div>
+    </div>
+  </div>
+  <script>
+    // Timeline data for popups
+    const eventData = {
+      popup1: {
+        title: "Cro Minion (Prehistoric)",
+        desc: "The Minions’ earliest adventure! In the short film <b>Cro Minion</b>, the Minions live among dinosaurs and discover their love for bananas."
+      },
+      popup2: {
+        title: "Minions in Egypt (c. 2500 BC)",
+        desc: "In <b>Minions</b>, the Minions serve the Pharaoh in Ancient Egypt, but accidentally cause the collapse of a pyramid."
+      },
+      popup3: {
+        title: "Thirty Years' War (1618–1648)",
+        desc: "A devastating religious and political war in Central Europe that shaped the continent’s future."
+      },
+      popup4: {
+        title: "Minions & Dracula (1700s)",
+        desc: "The Minions serve Count Dracula as seen in <b>Minions</b>, but accidentally expose him to sunlight during his birthday party."
+      },
+      popup5: {
+        title: "American Revolution (1775–1783)",
+        desc: "The 13 American colonies fight for independence from British rule, resulting in the founding of the United States."
+      },
+      popup6: {
+        title: "Napoleonic Wars (1803–1815)",
+        desc: "A series of major conflicts led by Napoleon Bonaparte, reshaping Europe’s political landscape."
+      },
+      popup7: {
+        title: "Minions & Napoleon (1800s)",
+        desc: "The Minions try to help Napoleon, but accidentally launch him out of his own cannon."
+      },
+      popup8: {
+        title: "World War I (1914–1918)",
+        desc: "The first global war, involving most world powers and resulting in massive casualties and political change."
+      },
+      popup9: {
+        title: "World War II (1939–1945)",
+        desc: "The most destructive conflict in human history, leading to the defeat of Nazi Germany and Imperial Japan."
+      },
+      popup10: {
+        title: "NFL Founded (1920)",
+        desc: "The American Professional Football Association (renamed NFL in 1922) is established, becoming the premier football league."
+      },
+      popup11: {
+        title: "Civil Rights Act (1964)",
+        desc: "A landmark U.S. law prohibiting discrimination based on race, color, religion, sex, or national origin."
+      },
+      popup12: {
+        title: "First Super Bowl (1967)",
+        desc: "The Green Bay Packers defeat the Kansas City Chiefs in the first AFL-NFL World Championship Game."
+      },
+      popup13: {
+        title: "Minions & Scarlet Overkill (1968)",
+        desc: "In <b>Minions</b>, Kevin, Stuart, and Bob meet supervillain Scarlet Overkill at Villain-Con in Orlando."
+      },
+      popup14: {
+        title: "Minions meet Gru (1968)",
+        desc: "At the end of <b>Minions</b>, the Minions find their true master: a young Gru, who steals the show (and the crown)."
+      },
+      popup15: {
+        title: "Vietnam War Ends (1975)",
+        desc: "The Vietnam War ends with the fall of Saigon, marking a significant moment in U.S. and world history."
+      },
+      popup16: {
+        title: "Minions: The Rise of Gru (1976)",
+        desc: "In <b>The Rise of Gru</b>, 12-year-old Gru teams up with the Minions and tries to join the Vicious 6."
+      },
+      popup17: {
+        title: "Berlin Wall Falls (1989)",
+        desc: "The Berlin Wall is torn down, symbolizing the end of the Cold War and the reunification of Germany."
+      },
+      popup18: {
+        title: "Despicable Me (2010)",
+        desc: "Gru adopts Margo, Edith, and Agnes, and attempts to steal the Moon with help from the Minions."
+      },
+      popup19: {
+        title: "Short Films (2010–2015)",
+        desc: "A series of Minion-centric shorts: <b>Home Makeover</b>, <b>Orientation Day</b>, <b>Banana</b>, <b>Puppy</b>, <b>Panic in the Mailroom</b>, <b>Training Wheels</b>, <b>Cro Minion</b>, <b>Competition</b>, <b>Binky Nelson Unpacified</b>."
+      },
+      popup20: {
+        title: "Affordable Care Act Signed (2010)",
+        desc: "President Obama signs the ACA, expanding healthcare coverage to millions of Americans."
+      },
+      popup21: {
+        title: "Despicable Me 2 (2013)",
+        desc: "Gru is recruited by the AVL, faces El Macho, and marries Lucy Wilde."
+      },
+      popup22: {
+        title: "Black Lives Matter Begins (2013)",
+        desc: "The BLM movement starts after the acquittal of George Zimmerman in the shooting of Trayvon Martin."
+      },
+      popup23: {
+        title: "Odell Beckham Jr. Catch (2014)",
+        desc: "OBJ makes a legendary one-handed catch for the Giants, instantly becoming an NFL icon."
+      },
+      popup24: {
+        title: "Marriage Equality in US (2015)",
+        desc: "The U.S. Supreme Court legalizes same-sex marriage nationwide."
+      },
+      popup25: {
+        title: "Despicable Me 3 (2017)",
+        desc: "Gru meets his twin brother Dru and battles the villainous Balthazar Bratt."
+      },
+      popup26: {
+        title: "#MeToo Movement (2017)",
+        desc: "A global movement against sexual harassment and assault gains momentum."
+      },
+      popup27: {
+        title: "COVID-19 Pandemic (2020)",
+        desc: "A global pandemic disrupts daily life, causing millions of deaths and changing the world."
+      },
+      popup28: {
+        title: "Rise of Gru (aftermath, 2022)",
+        desc: "The Minions continue their adventures with Gru, setting up for future escapades."
+      },
+      popup29: {
+        title: "Roe v. Wade Overturned (2022)",
+        desc: "The U.S. Supreme Court overturns Roe v. Wade, ending federal protection for abortion rights."
+      },
+      popup30: {
+        title: "Despicable Me 4 (2024)",
+        desc: "Gru faces Maxime Le Mal, and Gru Jr. is born. Minion mayhem continues!"
+      },
+      popup31: {
+        title: "Minions 3 (2026, upcoming)",
+        desc: "The Minions are back for a third film! Details to be revealed."
+      },
+      popup32: {
+        title: "Paris Olympics (2024)",
+        desc: "The Summer Olympics return to Paris, France."
+      }
+    };
+
+    // Popups
+    document.querySelectorAll('.event').forEach(ev => {
+      ev.addEventListener('click', () => {
+        const popupId = ev.getAttribute('data-popup');
+        const data = eventData[popupId];
+        document.getElementById('popup-inner').innerHTML = `<h2>${data.title}</h2><p>${data.desc}</p>`;
+        document.getElementById('popup-bg').classList.add('active');
+      });
+    });
+    function closePopup() {
+      document.getElementById('popup-bg').classList.remove('active');
+    }
+    document.getElementById('popup-bg').addEventListener('click', function(e) {
+      if (e.target === this) closePopup();
+    });
+
+    // Pan and zoom
+    let isDragging = false, startX, scrollLeft;
+    const container = document.getElementById('timelineContainer');
+    container.scrollLeft = 600; // Start near the middle
+    container.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.pageX;
+      scrollLeft = container.scrollLeft;
+    });
+    container.addEventListener('mouseleave', () => isDragging = false);
+    container.addEventListener('mouseup', () => isDragging = false);
+    container.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const x = e.pageX;
+      const walk = (x - startX) * 1.2;
+      container.scrollLeft = scrollLeft - walk;
+    });
+    // Touch support
+    container.addEventListener('touchstart', function(e) {
+      isDragging = true;
+      startX = e.touches[0].pageX;
+      scrollLeft = container.scrollLeft;
+    });
+    container.addEventListener('touchend', () => isDragging = false);
+    container.addEventListener('touchcancel', () => isDragging = false);
+    container.addEventListener('touchmove', function(e) {
+      if (!isDragging) return;
+      const x = e.touches[0].pageX;
+      const walk = (x - startX) * 1.2;
+      container.scrollLeft = scrollLeft - walk;
+    });
+
+    // Zoom functionality
+    let zoomLevel = 1;
+    function zoom(dir) {
+      zoomLevel += dir * 0.1;
+      zoomLevel = Math.max(0.5, Math.min(2.5, zoomLevel));
+      document.getElementById('timeline').style.transform = `translateY(-50%) scaleX(${zoomLevel})`;
+      document.querySelectorAll('.event').forEach(ev => {
+        ev.style.transform = `translateY(-50%) scale(${zoomLevel})`;
+      });
+    }
+  </script>
+</body>
+</html>
