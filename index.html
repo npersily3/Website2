@@ -2,129 +2,455 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Despicable Me & World Events Timeline</title>
   <style>
-    body { margin:0; background:#FED154; font-family:sans-serif; }
-    .timeline-container { position:fixed; top:60px; left:0; right:0; bottom:0; overflow:hidden; }
-    .timeline { position:absolute; top:50%; left:0; height:8px; background:#0357A0; border-radius:4px; }
-    .event {
-      position:absolute; top:50%;
-      transform:translateY(-50%);
-      text-align:center; width:120px;
-      cursor:pointer; z-index:2;
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+      :root {
+        --bg-color: #000;
+        --primary-color: #fff;
+        --secondary-color: #fff;
+      }
     }
-    .event .icon { width:48px; height:48px; border-radius:50%; background:#fff; margin:0 auto 6px auto; display:flex; align-items:center; justify-content:center; font-size:2em; border:2px solid #0357A0; }
-    .event .label { font-weight:bold; background:#fff7; border-radius:6px; padding:2px 6px; }
-    .event .year { font-size:0.85em; color:#0357A0; }
-    .zoom-controls { position:fixed; top:12px; right:32px; }
-    .zoom-controls button { font-size:1.5em; margin:0 4px; background:#0357A0; color:#fff; border:none; border-radius:50%; width:38px; height:38px; cursor:pointer; }
+    
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    :root {
+      --bg-color: #FED154;
+      --primary-color: #0357A0;
+      --secondary-color: #fff;
+    }
+
+    body { 
+      margin: 0; 
+      background: var(--bg-color); 
+      font-family: Arial, sans-serif;
+      line-height: 1.5;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 6px;
+      background: var(--primary-color);
+      color: var(--secondary-color);
+      padding: 8px;
+      text-decoration: none;
+      z-index: 1000;
+    }
+    
+    .skip-link:focus {
+      top: 6px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    header {
+      padding: 12px 20px;
+      background: var(--primary-color);
+      color: var(--secondary-color);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.5em;
+    }
+
+    .instructions {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 12px;
+      margin: 12px 20px;
+      border-radius: 6px;
+      border-left: 4px solid var(--primary-color);
+    }
+
+    .zoom-controls {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 100;
+    }
+
+    .zoom-controls button {
+      font-size: 1.2em;
+      margin: 0 2px;
+      background: var(--primary-color);
+      color: var(--secondary-color);
+      border: 2px solid var(--secondary-color);
+      border-radius: 4px;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .zoom-controls button:hover,
+    .zoom-controls button:focus {
+      background: var(--secondary-color);
+      color: var(--primary-color);
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
+
+    .timeline-container {
+      position: fixed;
+      top: 180px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: auto;
+      padding: 20px;
+    }
+
+    .timeline {
+      position: relative;
+      height: 8px;
+      background: var(--primary-color);
+      border-radius: 4px;
+      margin: 60px 0;
+    }
+
+    .event {
+      position: absolute;
+      top: -40px;
+      text-align: center;
+      width: 120px;
+      cursor: pointer;
+      z-index: 2;
+      transform: translateX(-50%);
+    }
+
+    .event:focus {
+      outline: 3px solid var(--primary-color);
+      outline-offset: 4px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 8px;
+    }
+
+    .event .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--secondary-color);
+      margin: 0 auto 6px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5em;
+      border: 3px solid var(--primary-color);
+    }
+
+    .event .label {
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 6px;
+      padding: 4px 8px;
+      border: 1px solid var(--primary-color);
+    }
+
+    .event .year {
+      font-size: 0.85em;
+      color: var(--primary-color);
+      font-weight: normal;
+    }
+
+    .event-details {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: var(--secondary-color);
+      border: 2px solid var(--primary-color);
+      border-radius: 8px;
+      padding: 16px;
+      display: none;
+      z-index: 200;
+    }
+
+    .event-details.visible {
+      display: block;
+    }
+
+    .close-details {
+      float: right;
+      background: none;
+      border: none;
+      font-size: 1.5em;
+      cursor: pointer;
+      color: var(--primary-color);
+    }
+
+    .close-details:hover,
+    .close-details:focus {
+      background: var(--primary-color);
+      color: var(--secondary-color);
+      border-radius: 4px;
+      outline: 2px solid var(--primary-color);
+    }
+
+    /* Focus indicator for timeline navigation */
+    .timeline:focus {
+      outline: 3px solid var(--primary-color);
+      outline-offset: 4px;
+    }
   </style>
 </head>
 <body>
-  <div class="zoom-controls">
-    <button onclick="zoom(-1)">−</button>
-    <button onclick="zoom(1)">+</button>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  
+  <header role="banner">
+    <h1>Despicable Me & World Events Timeline</h1>
+  </header>
+
+  <div class="instructions" role="region" aria-labelledby="instructions-heading">
+    <h2 id="instructions-heading" style="margin-top: 0; font-size: 1.1em;">How to use this timeline:</h2>
+    <p><strong>Navigate:</strong> Use Tab/Shift+Tab to move between events, or click/tap to select. Use arrow keys to scroll the timeline.<br>
+    <strong>Zoom:</strong> Use +/- buttons or keyboard shortcuts (+ and - keys).<br>
+    <strong>Pan:</strong> Click and drag the timeline or use arrow keys.</p>
   </div>
-  <div class="timeline-container" id="timelineContainer">
-    <div class="timeline" id="timeline"></div>
-    <!-- Events will be injected by JS -->
+
+  <nav class="zoom-controls" role="navigation" aria-label="Timeline zoom controls">
+    <button type="button" onclick="zoom(-1)" aria-label="Zoom out" title="Zoom out (- key)">−</button>
+    <button type="button" onclick="zoom(1)" aria-label="Zoom in" title="Zoom in (+ key)">+</button>
+  </nav>
+
+  <main id="main-content" role="main">
+    <div class="timeline-container" 
+         id="timelineContainer" 
+         role="application"
+         aria-label="Interactive timeline of Despicable Me and world events"
+         tabindex="0">
+      <div class="timeline" 
+           id="timeline" 
+           role="img" 
+           aria-label="Timeline spanning from prehistoric times to 2026"></div>
+      <!-- Events will be injected by JS -->
+    </div>
+  </main>
+
+  <div id="eventDetails" class="event-details" role="dialog" aria-live="polite" aria-labelledby="selected-event-title">
+    <button class="close-details" onclick="closeEventDetails()" aria-label="Close event details">×</button>
+    <h3 id="selected-event-title"></h3>
+    <p id="selected-event-description"></p>
   </div>
+
+  <div id="announcements" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
   <script>
-    // Event data and positions (spread out)
+    // Event data with additional accessibility information
     const events = [
-      { name: 'Cro Minion', icon: '🦕', year: 'Prehistoric' },
-      { name: 'Minions in Egypt', icon: '👑', year: 'c.2500 BC' },
-      { name: "Thirty Years' War", icon: '⚔️', year: '1618–1648' },
-      { name: 'Minions & Dracula', icon: '🧛‍♂️', year: '1700s' },
-      { name: 'American Revolution', icon: '🎆', year: '1775–1783' },
-      { name: 'Napoleonic Wars', icon: '🎖️', year: '1803–1815' },
-      { name: 'Minions & Napoleon', icon: '🇫🇷', year: '1800s' },
-      { name: 'World War I', icon: '🌍', year: '1914–1918' },
-      { name: 'World War II', icon: '🌎', year: '1939–1945' },
-      { name: 'NFL Founded', icon: '🏈', year: '1920' },
-      { name: 'Civil Rights Act', icon: '⚖️', year: '1964' },
-      { name: 'First Super Bowl', icon: '🏆', year: '1967' },
-      { name: 'Minions & Scarlet', icon: '💎', year: '1968' },
-      { name: 'Minions meet Gru', icon: '👦', year: '1968' },
-      { name: 'Vietnam War Ends', icon: '🪖', year: '1975' },
-      { name: 'Minions: The Rise of Gru', icon: '🚲', year: '1976' },
-      { name: 'Berlin Wall Falls', icon: '🧱', year: '1989' },
-      { name: 'Despicable Me', icon: '😈', year: '2010' },
-      { name: 'Short Films', icon: '🎬', year: '2010–2015' },
-      { name: 'Affordable Care Act', icon: '💊', year: '2010' },
-      { name: 'Despicable Me 2', icon: '👰', year: '2013' },
-      { name: 'Black Lives Matter', icon: '✊🏾', year: '2013' },
-      { name: 'OBJ Catch', icon: '🤯', year: '2014' },
-      { name: 'Marriage Equality', icon: '🌈', year: '2015' },
-      { name: 'Despicable Me 3', icon: '🕺', year: '2017' },
-      { name: '#MeToo', icon: '#️⃣', year: '2017' },
-      { name: 'COVID-19', icon: '🦠', year: '2020' },
-      { name: 'Rise of Gru (aftermath)', icon: '🔮', year: '2022' },
-      { name: 'Roe v. Wade Overturned', icon: '⚖️', year: '2022' },
-      { name: 'Despicable Me 4', icon: '👶', year: '2024' },
-      { name: 'Minions 3', icon: '🧨', year: '2026' },
-      { name: 'Paris Olympics', icon: '🇫🇷', year: '2024' }
+      { name: 'Cro Minion', icon: '🦕', year: 'Prehistoric', description: 'Minions serve prehistoric creatures in the dawn of time.' },
+      { name: 'Minions in Egypt', icon: '👑', year: 'c.2500 BC', description: 'Minions build pyramids and serve pharaohs in ancient Egypt.' },
+      { name: "Thirty Years' War", icon: '⚔️', year: '1618–1648', description: 'Major European conflict reshaping political boundaries.' },
+      { name: 'Minions & Dracula', icon: '🧛‍♂️', year: '1700s', description: 'Minions encounter the famous vampire count.' },
+      { name: 'American Revolution', icon: '🎆', year: '1775–1783', description: 'Thirteen colonies fight for independence from Britain.' },
+      { name: 'Napoleonic Wars', icon: '🎖️', year: '1803–1815', description: 'Series of wars led by Napoleon Bonaparte across Europe.' },
+      { name: 'Minions & Napoleon', icon: '🇫🇷', year: '1800s', description: 'Minions accidentally contribute to Napoleon\'s downfall.' },
+      { name: 'World War I', icon: '🌍', year: '1914–1918', description: 'The Great War transforms global politics and society.' },
+      { name: 'World War II', icon: '🌎', year: '1939–1945', description: 'Global conflict that reshaped the modern world.' },
+      { name: 'NFL Founded', icon: '🏈', year: '1920', description: 'National Football League established in the United States.' },
+      { name: 'Civil Rights Act', icon: '⚖️', year: '1964', description: 'Landmark legislation ending segregation in the United States.' },
+      { name: 'First Super Bowl', icon: '🏆', year: '1967', description: 'Green Bay Packers defeat Kansas City Chiefs 35-10.' },
+      { name: 'Minions & Scarlet', icon: '💎', year: '1968', description: 'Minions encounter the villainous Scarlet Overkill.' },
+      { name: 'Minions meet Gru', icon: '👦', year: '1968', description: 'The beginning of the Minions\' relationship with young Gru.' },
+      { name: 'Vietnam War Ends', icon: '🪖', year: '1975', description: 'Fall of Saigon marks the end of the Vietnam War.' },
+      { name: 'Minions: The Rise of Gru', icon: '🚲', year: '1976', description: 'Young Gru attempts to join the supervillain group Vicious 6.' },
+      { name: 'Berlin Wall Falls', icon: '🧱', year: '1989', description: 'Symbol of Cold War division comes down in Germany.' },
+      { name: 'Despicable Me', icon: '😈', year: '2010', description: 'Gru adopts three girls while planning to steal the moon.' },
+      { name: 'Short Films', icon: '🎬', year: '2010–2015', description: 'Various Minion-focused animated short films released.' },
+      { name: 'Affordable Care Act', icon: '💊', year: '2010', description: 'Major healthcare reform legislation passed in the US.' },
+      { name: 'Despicable Me 2', icon: '👰', year: '2013', description: 'Gru works with the Anti-Villain League and finds love.' },
+      { name: 'Black Lives Matter', icon: '✊🏾', year: '2013', description: 'Social movement advocating against systemic racism begins.' },
+      { name: 'OBJ Catch', icon: '🤯', year: '2014', description: 'Odell Beckham Jr. makes legendary one-handed catch.' },
+      { name: 'Marriage Equality', icon: '🌈', year: '2015', description: 'Supreme Court legalizes same-sex marriage nationwide.' },
+      { name: 'Despicable Me 3', icon: '🕺', year: '2017', description: 'Gru meets his twin brother Dru and faces Balthazar Bratt.' },
+      { name: '#MeToo', icon: '#️⃣', year: '2017', description: 'Movement against sexual harassment and assault gains momentum.' },
+      { name: 'COVID-19', icon: '🦠', year: '2020', description: 'Global pandemic fundamentally changes daily life worldwide.' },
+      { name: 'Rise of Gru (aftermath)', icon: '🔮', year: '2022', description: 'Cultural phenomenon following Minions: The Rise of Gru release.' },
+      { name: 'Roe v. Wade Overturned', icon: '⚖️', year: '2022', description: 'Supreme Court overturns constitutional right to abortion.' },
+      { name: 'Despicable Me 4', icon: '👶', year: '2024', description: 'Latest installment in the Despicable Me franchise.' },
+      { name: 'Minions 3', icon: '🧨', year: '2026', description: 'Upcoming third standalone Minions film.' },
+      { name: 'Paris Olympics', icon: '🇫🇷', year: '2024', description: '2024 Summer Olympics held in Paris, France.' }
     ];
+
     const start = 40, end = 3000;
     const positions = events.map((_, i) => Math.round(start + i * (end - start) / (events.length - 1)));
 
-    // State
     let zoomLevel = 1.0;
     let minZoom = 0.5, maxZoom = 2.5;
+    let currentEventIndex = -1;
+
+    function announce(message) {
+      const announcements = document.getElementById('announcements');
+      announcements.textContent = message;
+    }
 
     function renderTimeline() {
       const container = document.getElementById('timelineContainer');
       const timeline = document.getElementById('timeline');
-      // Set timeline width based on zoom
+      
       const baseWidth = end + 60;
       const width = baseWidth * zoomLevel;
       timeline.style.width = width + 'px';
-      timeline.style.left = '0px';
 
       // Remove old events
       container.querySelectorAll('.event').forEach(e => e.remove());
 
-      // Decide which events to show at current zoom
       let step = 1;
       if (zoomLevel > 2.0) step = 3;
       else if (zoomLevel > 1.5) step = 2;
-      // Show fewer events at high zoom
+      
       const visibleEvents = events.filter((_, i) => i % step === 0);
 
-      // Render events
       visibleEvents.forEach((ev, idx) => {
-        // Find the original index to get correct position
         const origIdx = events.findIndex(e => e.name === ev.name);
         const x = Math.round((positions[origIdx] / baseWidth) * width);
+        
         const div = document.createElement('div');
         div.className = 'event';
         div.style.left = x + 'px';
-        div.innerHTML = `<div class="icon">${ev.icon}</div>
-          <div class="label">${ev.name}<br><span class="year">${ev.year}</span></div>`;
+        div.setAttribute('tabindex', '0');
+        div.setAttribute('role', 'button');
+        div.setAttribute('aria-label', `${ev.name}, ${ev.year}. Press Enter or Space for details.`);
+        div.setAttribute('data-event-index', origIdx);
+        
+        div.innerHTML = `
+          <div class="icon" aria-hidden="true">${ev.icon}</div>
+          <div class="label">
+            ${ev.name}<br>
+            <span class="year">${ev.year}</span>
+          </div>
+        `;
+        
+        div.addEventListener('click', () => showEventDetails(origIdx));
+        div.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            showEventDetails(origIdx);
+          }
+        });
+        
         container.appendChild(div);
       });
+
+      announce(`Timeline updated. Showing ${visibleEvents.length} events at ${Math.round(zoomLevel * 100)}% zoom.`);
+    }
+
+    function showEventDetails(eventIndex) {
+      const event = events[eventIndex];
+      const details = document.getElementById('eventDetails');
+      const title = document.getElementById('selected-event-title');
+      const description = document.getElementById('selected-event-description');
+      
+      title.textContent = `${event.name} (${event.year})`;
+      description.textContent = event.description;
+      
+      details.classList.add('visible');
+      details.querySelector('.close-details').focus();
+      
+      currentEventIndex = eventIndex;
+      announce(`Selected ${event.name}, ${event.year}. ${event.description}`);
+    }
+
+    function closeEventDetails() {
+      const details = document.getElementById('eventDetails');
+      details.classList.remove('visible');
+      
+      // Return focus to the selected event or timeline
+      if (currentEventIndex >= 0) {
+        const eventElement = document.querySelector(`[data-event-index="${currentEventIndex}"]`);
+        if (eventElement) {
+          eventElement.focus();
+        }
+      }
+      currentEventIndex = -1;
     }
 
     function zoom(dir) {
+      const oldZoom = zoomLevel;
       zoomLevel += dir * 0.2;
       zoomLevel = Math.max(minZoom, Math.min(maxZoom, zoomLevel));
-      renderTimeline();
+      
+      if (oldZoom !== zoomLevel) {
+        renderTimeline();
+      }
     }
 
-    // Initial render
+    // Keyboard support
+    document.addEventListener('keydown', (e) => {
+      if (e.target.closest('.event-details')) return;
+      
+      switch (e.key) {
+        case '+':
+        case '=':
+          e.preventDefault();
+          zoom(1);
+          break;
+        case '-':
+        case '_':
+          e.preventDefault();
+          zoom(-1);
+          break;
+        case 'Escape':
+          if (document.getElementById('eventDetails').classList.contains('visible')) {
+            closeEventDetails();
+          }
+          break;
+        case 'ArrowLeft':
+        case 'ArrowRight':
+          if (e.target === document.getElementById('timelineContainer')) {
+            e.preventDefault();
+            const container = document.getElementById('timelineContainer');
+            container.scrollLeft += e.key === 'ArrowRight' ? 50 : -50;
+          }
+          break;
+      }
+    });
+
+    // Initialize
     renderTimeline();
 
-    // Pan support
+    // Pan support (simplified for accessibility)
     let isDragging = false, startX, scrollLeft;
     const container = document.getElementById('timelineContainer');
     container.scrollLeft = 600;
+
     container.addEventListener('mousedown', (e) => {
+      if (e.target.closest('.event')) return;
       isDragging = true;
       startX = e.pageX;
       scrollLeft = container.scrollLeft;
+      container.style.cursor = 'grabbing';
     });
-    container.addEventListener('mouseleave', () => isDragging = false);
-    container.addEventListener('mouseup', () => isDragging = false);
+
+    container.addEventListener('mouseleave', () => {
+      isDragging = false;
+      container.style.cursor = 'grab';
+    });
+
+    container.addEventListener('mouseup', () => {
+      isDragging = false;
+      container.style.cursor = 'grab';
+    });
+
     container.addEventListener('mousemove', (e) => {
       if (!isDragging) return;
       e.preventDefault();
@@ -132,14 +458,23 @@
       const walk = (x - startX) * 1.2;
       container.scrollLeft = scrollLeft - walk;
     });
+
     // Touch support
     container.addEventListener('touchstart', function(e) {
+      if (e.target.closest('.event')) return;
       isDragging = true;
       startX = e.touches[0].pageX;
       scrollLeft = container.scrollLeft;
     });
-    container.addEventListener('touchend', () => isDragging = false);
-    container.addEventListener('touchcancel', () => isDragging = false);
+
+    container.addEventListener('touchend', () => {
+      isDragging = false;
+    });
+
+    container.addEventListener('touchcancel', () => {
+      isDragging = false;
+    });
+
     container.addEventListener('touchmove', function(e) {
       if (!isDragging) return;
       const x = e.touches[0].pageX;
