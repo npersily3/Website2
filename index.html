@@ -332,8 +332,41 @@
         div.setAttribute('aria-label', `${ev.name}, ${ev.year}. Press Enter or Space for details.`);
         div.setAttribute('data-event-index', origIdx);
         
+        const iconDescriptions = {
+          '🦕': 'Dinosaur',
+          '👑': 'Crown',
+          '⚔️': 'Crossed swords',
+          '🧛‍♂️': 'Vampire',
+          '🎆': 'Fireworks',
+          '🎖️': 'Military medal',
+          '🇫🇷': 'French flag',
+          '🌍': 'Earth globe Europe-Africa',
+          '🌎': 'Earth globe Americas',
+          '🏈': 'American football',
+          '⚖️': 'Balance scale',
+          '🏆': 'Trophy',
+          '💎': 'Diamond',
+          '👦': 'Boy',
+          '🪖': 'Military helmet',
+          '🚲': 'Bicycle',
+          '🧱': 'Brick',
+          '😈': 'Smiling face with horns',
+          '🎬': 'Clapper board',
+          '💊': 'Pill',
+          '👰': 'Bride',
+          '✊🏾': 'Raised fist medium-dark skin tone',
+          '🤯': 'Exploding head',
+          '🌈': 'Rainbow',
+          '🕺': 'Man dancing',
+          '#️⃣': 'Number sign',
+          '🦠': 'Microbe',
+          '🔮': 'Crystal ball',
+          '👶': 'Baby',
+          '🧨': 'Firecracker'
+        };
+        
         div.innerHTML = `
-          <div class="icon" aria-hidden="true">${ev.icon}</div>
+          <div class="icon" role="img" aria-label="${iconDescriptions[ev.icon] || 'Icon'}">${ev.icon}</div>
           <div class="label">
             ${ev.name}<br>
             <span class="year">${ev.year}</span>
